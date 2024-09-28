@@ -14,10 +14,10 @@ public class MecanumTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Declare our motors
         // Make sure your ID's match your configuration
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("left back motor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("right back motor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("stuff");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("stuff2");
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor"); // port 0
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor"); // port 1
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor"); // port 2
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor"); // port3
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
