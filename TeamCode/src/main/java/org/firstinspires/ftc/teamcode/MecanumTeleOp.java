@@ -14,10 +14,10 @@ public class MecanumTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Declare our motors
         // Make sure your ID's match your configuration
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("left back motor");
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("right back motor");
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("stuff");
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("stuff2");
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
@@ -47,6 +47,7 @@ public class MecanumTeleOp extends LinearOpMode {
                     0.0, 0.0,
                     1.0, -1.0
             };
+
 
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = (gamepad1.left_trigger + -gamepad1.right_trigger) * 1.1; // Counteract imperfect strafing
