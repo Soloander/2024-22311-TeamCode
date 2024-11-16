@@ -19,16 +19,18 @@ public class MecanumTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor"); // port 1
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor"); // port 2
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor"); // port 3
+        DcMotor arm = hardwareMap.dcMotor.get("ar"); // expansion hub -- port 0
+        DcMotor Spin = hardwareMap.dcMotor.get("armExtnd"); // expansion hub -- port 2
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot move   s backwards when commanded to go forwards,
         // reverse the left side instead.
         // See the note about this earlier on this page.
 
-//        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-           backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-           backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+       // frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        // frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+  //         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+          // backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
@@ -68,6 +70,36 @@ public class MecanumTeleOp extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
+
+
+            // Define variables
+            double targetPosition = arm.getCurrentPosition();
+            boolean holdingPosition = false;
+
+            double armPower = gamepad2.right_trigger - gamepad2.left_trigger;
+            if (Math.abs(armPower) > 0) {
+                armPower = Math.min(0.9, Math.max(armPower, -0.9)); // Clamp armPower within -0.9 to 0.9
+                arm.setPower(armPower); // Set the arm power
+                targetPosition = arm.getCurrentPosition(); // Update target position
+                arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Ensure encoder mode is set for manual control
+                holdingPosition = false;
+            } else {
+                if (!holdingPosition) {
+                    targetPosition = arm.getCurrentPosition();
+                    arm.setTargetPosition((int) targetPosition);
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    arm.setPower(0.899999999999999999999999999999); // Increase power to ensure it holds position
+                    holdingPosition = true;
+                }
+            }
+
+            telemetry.addData("position", arm.getCurrentPosition());
+            telemetry.addData("arm power", armPower);
+            telemetry.addData("target position", targetPosition);
+
+
+
+
             if (rorx >= 0) {
                 frontLeftPower  = frontLeftPower  + xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower)  + Math.abs(xpmult[0]) * Math.abs(rorx), 1);
                 frontRightPower = frontRightPower + xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(xpmult[1]) * Math.abs(rorx), 1);
@@ -96,6 +128,6 @@ public class MecanumTeleOp extends LinearOpMode {
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
-        }
+            telemetry.update();
     }
-}
+} }
