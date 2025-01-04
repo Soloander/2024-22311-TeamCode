@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp
 public class MecanumTeleOp extends LinearOpMode {
-    public double scale(double value, double fromLow, double fromHigh, double toLow, double toHigh) {
+    public double   scale(double value, double fromLow, double fromHigh, double toLow, double toHigh) {
         return (toHigh - toLow) * (value - fromLow) / (fromHigh - fromLow) + toLow;
     }
     @Override
@@ -19,8 +21,12 @@ public class MecanumTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor"); // port 1
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor"); // port 2
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor"); // port 3
-        DcMotor arm = hardwareMap.dcMotor.get("ar"); // expansion hub -- port 0
-        DcMotor Spin = hardwareMap.dcMotor.get("armExtnd"); // expansion hub -- port 2
+        DcMotor armR = hardwareMap.dcMotor.get("armR"); // expansion hub -- port 0
+        DcMotor Spin = hardwareMap.dcMotor.get("armExtnd"); // expansion hub -- port 1
+        DcMotor armL = hardwareMap.dcMotor.get("armL"); // expansion hub -- port 2
+        Servo Claw = hardwareMap.get(Servo.class, "Claw");
+        Servo ClawL = hardwareMap.get(Servo.class, "ClawL");
+        Servo ClawR = hardwareMap.get(Servo.class, "ClawR");
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot move   s backwards when commanded to go forwards,
@@ -72,62 +78,102 @@ public class MecanumTeleOp extends LinearOpMode {
 
 
 
-            // Define variables
-            double targetPosition = arm.getCurrentPosition();
-            boolean holdingPosition = false;
 
-            double armPower = gamepad2.right_trigger - gamepad2.left_trigger;
-            if (Math.abs(armPower) > 0) {
-                armPower = Math.min(0.9, Math.max(armPower, -0.9)); // Clamp armPower within -0.9 to 0.9
-                arm.setPower(armPower); // Set the arm power
-                targetPosition = arm.getCurrentPosition(); // Update target position
-                arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Ensure encoder mode is set for manual control
-                holdingPosition = false;
-            } else {
-                if (!holdingPosition) {
-                    targetPosition = arm.getCurrentPosition();
-                    arm.setTargetPosition((int) targetPosition);
-                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    arm.setPower(0.899999999999999999999999999999); // Increase power to ensure it holds position
-                    holdingPosition = true;
+
+              {
+
+                if(gamepad2.a){;
+                    Claw.setPosition(1);
                 }
+                if(gamepad2.x){
+                  Claw.setPosition(0);
+              }
+
+
+
+
+                  telemetry.addData("Claw", Claw.getPosition());
+
+
+                  telemetry.addData("ClawL", ClawL.getPosition());
+                  telemetry.addData("ClawR", ClawR.getPosition());
+
+
             }
 
-            telemetry.addData("position", arm.getCurrentPosition());
-            telemetry.addData("arm power", armPower);
-            telemetry.addData("target position", targetPosition);
+            if (gamepad2.y){ClawL.setPosition(0);}
+           else {ClawL.setPosition(1);}
+
+            if (gamepad2.y){ClawR.setPosition(1);}
+            else {ClawR.setPosition(0);}
+
+            double Rotaion;
+
+            double Spin1 = gamepad2.right_stick_y;
+
+            Spin1 = Math.min(Spin1, 1);
+            Spin1 = Math.max(Spin1, -1);
+
+            Spin.setPower(Spin1);
 
 
 
 
-            if (rorx >= 0) {
-                frontLeftPower  = frontLeftPower  + xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower)  + Math.abs(xpmult[0]) * Math.abs(rorx), 1);
-                frontRightPower = frontRightPower + xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(xpmult[1]) * Math.abs(rorx), 1);
-                backLeftPower   = backLeftPower   + xpmult[2] * rorx / Math.min(Math.abs(backLeftPower)   + Math.abs(xpmult[2]) * Math.abs(rorx), 1);
-                backRightPower  = backRightPower  + xpmult[3] * rorx / Math.min(Math.abs(backRightPower)  + Math.abs(xpmult[3]) * Math.abs(rorx), 1);
-            } else {
-                frontLeftPower  = frontLeftPower  - xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower)  + Math.abs(xnmult[0]) * Math.abs(rorx), 1);
-                frontRightPower = frontRightPower - xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(xnmult[1]) * Math.abs(rorx), 1);
-                backLeftPower   = backLeftPower   - xpmult[2] * rorx / Math.min(Math.abs(backLeftPower)   + Math.abs(xnmult[2]) * Math.abs(rorx), 1);
-                backRightPower  = backRightPower  - xpmult[3] * rorx / Math.min(Math.abs(backRightPower)  + Math.abs(xnmult[3]) * Math.abs(rorx), 1);
+                double armPower = gamepad2.left_stick_y;
+                double armPower1 = gamepad2.left_stick_y;
+
+                // Clamp armPower within -0.8 to 0.8
+            armPower = Math.max(-1, Math.min(armPower, 1));
+            armPower = Math.max(-1, Math.min(armPower, 1));
+
+       
+
+//                double currentPower = arm1.getPower();
+//                currentPower = Arm2.getPower();
+//                armPower = currentPower + (targetPower - curr entPower) * 0.1;
+
+                armL.setPower(armPower);
+                armR.setPower(armPower1);
+                int targetPositionL = armL.getCurrentPosition();
+                int targetPositionR = armR.getCurrentPosition();
+
+
+                telemetry.addData("arm power", armPower);
+                telemetry.addData("arm power1", armPower1);
+                telemetry.addData("arm powerR", targetPositionL);
+                telemetry.addData("arm powerL", targetPositionR);
+                telemetry.update();
+
+
+                if (rorx >= 0) {
+                    frontLeftPower = frontLeftPower + xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower) + Math.abs(xpmult[0]) * Math.abs(rorx), 1);
+                    frontRightPower = frontRightPower + xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(xpmult[1]) * Math.abs(rorx), 1);
+                    backLeftPower = backLeftPower + xpmult[2] * rorx / Math.min(Math.abs(backLeftPower) + Math.abs(xpmult[2]) * Math.abs(rorx), 1);
+                    backRightPower = backRightPower + xpmult[3] * rorx / Math.min(Math.abs(backRightPower) + Math.abs(xpmult[3]) * Math.abs(rorx), 1);
+                } else {
+                    frontLeftPower = frontLeftPower - xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower) + Math.abs(xnmult[0]) * Math.abs(rorx), 1);
+                    frontRightPower = frontRightPower - xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(xnmult[1]) * Math.abs(rorx), 1);
+                    backLeftPower = backLeftPower - xpmult[2] * rorx / Math.min(Math.abs(backLeftPower) + Math.abs(xnmult[2]) * Math.abs(rorx), 1);
+                    backRightPower = backRightPower - xpmult[3] * rorx / Math.min(Math.abs(backRightPower) + Math.abs(xnmult[3]) * Math.abs(rorx), 1);
+                }
+
+                if (rory >= 0) {
+                    frontLeftPower = frontLeftPower + xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower) + Math.abs(ypmult[0]) * Math.abs(rory), 1);
+                    frontRightPower = frontRightPower + xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(ypmult[1]) * Math.abs(rory), 1);
+                    backLeftPower = backLeftPower + xpmult[2] * rorx / Math.min(Math.abs(backLeftPower) + Math.abs(ypmult[2]) * Math.abs(rory), 1);
+                    backRightPower = backRightPower + xpmult[3] * rorx / Math.min(Math.abs(backRightPower) + Math.abs(ypmult[3]) * Math.abs(rory), 1);
+                } else {
+                    frontLeftPower = frontLeftPower - xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower) + Math.abs(ynmult[0]) * Math.abs(rory), 1);
+                    frontRightPower = frontRightPower - xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(ynmult[1]) * Math.abs(rory), 1);
+                    backLeftPower = backLeftPower - xpmult[2] * rorx / Math.min(Math.abs(backLeftPower) + Math.abs(ynmult[2]) * Math.abs(rory), 1);
+                    backRightPower = backRightPower - xpmult[3] * rorx / Math.min(Math.abs(backRightPower) + Math.abs(ynmult[3]) * Math.abs(rory), 1);
+                }
+
+                frontLeftMotor.setPower(frontLeftPower);
+                backLeftMotor.setPower(backLeftPower);
+                frontRightMotor.setPower(frontRightPower);
+                backRightMotor.setPower(backRightPower);
+                telemetry.update();
+
             }
-
-            if (rory >= 0) {
-                frontLeftPower  = frontLeftPower  + xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower)  + Math.abs(ypmult[0]) * Math.abs(rory), 1);
-                frontRightPower = frontRightPower + xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(ypmult[1]) * Math.abs(rory), 1);
-                backLeftPower   = backLeftPower   + xpmult[2] * rorx / Math.min(Math.abs(backLeftPower)   + Math.abs(ypmult[2]) * Math.abs(rory), 1);
-                backRightPower  = backRightPower  + xpmult[3] * rorx / Math.min(Math.abs(backRightPower)  + Math.abs(ypmult[3]) * Math.abs(rory), 1);
-            } else {
-                frontLeftPower  = frontLeftPower  - xpmult[0] * rorx / Math.min(Math.abs(frontLeftPower)  + Math.abs(ynmult[0]) * Math.abs(rory), 1);
-                frontRightPower = frontRightPower - xpmult[1] * rorx / Math.min(Math.abs(frontRightPower) + Math.abs(ynmult[1]) * Math.abs(rory), 1);
-                backLeftPower   = backLeftPower   - xpmult[2] * rorx / Math.min(Math.abs(backLeftPower)   + Math.abs(ynmult[2]) * Math.abs(rory), 1);
-                backRightPower  = backRightPower  - xpmult[3] * rorx / Math.min(Math.abs(backRightPower)  + Math.abs(ynmult[3]) * Math.abs(rory), 1);
-            }
-
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
-            telemetry.update();
-    }
-} }
+        } }
